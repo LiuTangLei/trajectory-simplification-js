@@ -1,1 +1,1 @@
-# Douglas-Peucker-js
+Douglas-Peucker by JavaScript
