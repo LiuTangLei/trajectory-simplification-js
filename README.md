@@ -1,1 +1,1 @@
-Douglas-Peucker by JavaScript
+Douglas-Peucker by JavaScript and TypeScript
