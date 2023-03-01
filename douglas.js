@@ -1,4 +1,4 @@
-//计算两点之间的距离
+// Calculate the distance between two points
 const calculationDistance = (point1, point2) => {
     let lat1 = point1.latitude;
     let lat2 = point2.latitude;
@@ -11,7 +11,7 @@ const calculationDistance = (point1, point2) => {
     let s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
     return s * 6370996.81;
 };
-//计算点pX到点pA和pB所确定的直线的距离
+// Calculate the distance between point pX and the line determined by points pA and pB
 const distToSegment = (start, end, center) => {
     let a = Math.abs(calculationDistance(start, end));
     let b = Math.abs(calculationDistance(start, center));
@@ -20,7 +20,7 @@ const distToSegment = (start, end, center) => {
     let s = Math.sqrt(Math.abs(p * (p - a) * (p - b) * (p - c)));
     return s * 2.0 / a;
 };
-//递归方式压缩轨迹
+// Recursively compress the trajectory
 const compressLine = (coordinate, result, start, end, dMax) => {
     if (start < end) {
         let maxDist = 0;
@@ -35,9 +35,9 @@ const compressLine = (coordinate, result, start, end, dMax) => {
             }
         }
         if (maxDist >= dMax) {
-            //将当前点加入到过滤数组中
+// Add the current point to the filtered array
             result.push(coordinate[currentIndex]);
-            //将原来的线段以当前点为中心拆成两段，分别进行递归处理
+// Split the original line segment into two segments with the current point as the center and recursively process them separately
             compressLine(coordinate, result, start, currentIndex, dMax);
             compressLine(coordinate, result, currentIndex, end, dMax);
         }
@@ -47,10 +47,10 @@ const compressLine = (coordinate, result, start, end, dMax) => {
 
 /**
  *
- *@param coordinate 原始轨迹Array<{latitude,longitude}>
- *@param dMax 允许最大距离误差
- *@return douglasResult 抽稀后的轨迹
- *
+
+ @param coordinate Original trajectory Array<{latitude,longitude}>
+ @param dMax Maximum allowable distance error
+ @return douglasResult Simplified trajectory
  */
 const douglasPeucker = (coordinate, dMax = 10) => {
     if (!coordinate || !(coordinate.length > 2)) {
