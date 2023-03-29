@@ -1,6 +1,15 @@
-- # Trajectory Simplification Algorithms
+- # Trajectory Simplification JS
 
-This project provides an overview of several trajectory simplification algorithms commonly used in data processing and analysis.
+Trajectory Simplification JS is a lightweight, modular, and customizable geospatial simplification library that focuses on providing a collection of efficient trajectory simplification algorithms for JavaScript and TypeScript projects. Each algorithm is implemented in a separate, minimalistic file, making it easy for users to copy, modify, and integrate them into their projects.
+## Key Advantages 
+1. **Lightweight and modular** : Unlike larger geospatial libraries, Trajectory Simplification JS focuses on providing lean, efficient algorithms without any unnecessary dependencies or bloat. This makes it suitable for projects where performance and simplicity are crucial. 
+2. **Easy customization** : Each algorithm is implemented in a standalone file, making it straightforward for users to copy and modify the code to suit their specific needs. This level of customization allows for more fine-grained control over the algorithm's behavior and performance. 
+3. **Flexible integration** : Trajectory Simplification JS's modular design enables users to import only the algorithms they need, resulting in a smaller code footprint and improved performance in their projects. 
+4. **Comprehensive collection** : Trajectory Simplification JS includes a wide range of trajectory simplification algorithms, such as Douglas-Peucker, Visvalingam-Whyatt, Radial Distance, and more, making it a versatile choice for diverse use cases and applications. 
+5. **Well-documented code** : The algorithms are accompanied by clear and detailed comments, making it easy for users to understand the inner workings of each algorithm and adapt them as needed.
+
+Choose Trajectory Simplification JS for a lightweight, customizable, and efficient solution to your geospatial simplification needs.
+
 ## Douglas-Peucker Algorithm
 ### Advantages
 - Applicable to various types of trajectory data.
