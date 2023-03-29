@@ -17,7 +17,7 @@ const calculationDistance = (point1: Coordinate, point2: Coordinate): number => 
   
   const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
   
-  return s * 6371e3;
+  return s * 6370996.81;
 };
 
 // Calculate the area of a triangle
