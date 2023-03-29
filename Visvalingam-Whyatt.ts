@@ -3,36 +3,33 @@ interface Coordinate {
   longitude: number;
 }
 
+const EARTH_RADIUS = 6370996.81;
+
 // Calculate the distance between two points
-const calculationDistance = (point1: Coordinate, point2: Coordinate): number => {
-  const lat1 = point1.latitude;
-  const lat2 = point2.latitude;
-  const lng1 = point1.longitude;
-  const lng2 = point2.longitude;
-  
+const calculateDistance = <T extends Coordinate>(point1: T, point2: T): number => {
+  const { latitude: lat1, longitude: lng1 } = point1;
+  const { latitude: lat2, longitude: lng2 } = point2;
+
   const radLat1 = lat1 * Math.PI / 180.0;
   const radLat2 = lat2 * Math.PI / 180.0;
   const a = radLat1 - radLat2;
   const b = (lng1 * Math.PI / 180.0) - (lng2 * Math.PI / 180.0);
-  
   const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
-  
-  return s * 6370996.81;
+
+  return s * EARTH_RADIUS;
 };
 
 // Calculate the area of a triangle
-const calculateTriangleArea = (a: Coordinate, b: Coordinate, c: Coordinate): number => {
-  const ab = calculationDistance(a, b);
-  const bc = calculationDistance(b, c);
-  const ca = calculationDistance(c, a);
+const calculateTriangleArea = <T extends Coordinate>(a: T, b: T, c: T): number => {
+  const ab = calculateDistance(a, b);
+  const bc = calculateDistance(b, c);
+  const ca = calculateDistance(c, a);
 
   const s = (ab + bc + ca) / 2;
-  const area = Math.sqrt(s * (s - ab) * (s - bc) * (s - ca));
-
-  return area;
+  return Math.sqrt(s * (s - ab) * (s - bc) * (s - ca));
 };
 
-const visvalingamWhyatt = (coordinates: Coordinate[], tolerance: number): Coordinate[] => {
+const visvalingamWhyatt = <T extends Coordinate>(coordinates: T[], tolerance: number): T[] => {
   // Continue until only two coordinates are left, or the minimum area is greater than or equal to the tolerance
   while (coordinates.length > 2) {
     let minArea = Infinity;
@@ -59,3 +56,5 @@ const visvalingamWhyatt = (coordinates: Coordinate[], tolerance: number): Coordi
 
   return coordinates;
 };
+
+export default { visvalingamWhyatt };
