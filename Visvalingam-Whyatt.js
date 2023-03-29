@@ -1,14 +1,17 @@
 // Calculate the distance between two points
 const calculationDistance = (point1, point2) => {
-  const ab = calculationDistance(a, b);
-  const bc = calculationDistance(b, c);
-  const ca = calculationDistance(c, a);
-
-  const s = (ab + bc + ca) / 2;
-  const area = Math.sqrt(s * (s - ab) * (s - bc) * (s - ca));
-
-  return area;
+  let lat1 = point1.latitude;
+  let lat2 = point2.latitude;
+  let lng1 = point1.longitude;
+  let lng2 = point2.longitude;
+  let radLat1 = lat1 * Math.PI / 180.0;
+  let radLat2 = lat2 * Math.PI / 180.0;
+  let a = radLat1 - radLat2;
+  let b = (lng1 * Math.PI / 180.0) - (lng2 * Math.PI / 180.0);
+  let s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
+  return s * 6370996.81;
 };
+
 
 // Calculate the area of a triangle
 const calculateTriangleArea = (a, b, c) => {
