@@ -55,6 +55,19 @@ Suitable for scenarios that require rapid trajectory simplification with low req
 
 Suitable for scenarios that require the preservation of topological characteristics, such as road networks and geographic information systems.
 
+## Sliding-Window Algorithm### Advantages
+- Simple implementation, easy to understand and use.
+- Suitable for large-scale trajectory data processing.
+- Can control the level of simplification by adjusting the window size.
+
+### Disadvantages
+- Limited in handling complex trajectory shapes.
+- The choice of window size has a significant impact on the simplification effect.
+- May not be suitable for trajectories with uneven point densities.
+
+### Applicable Scenarios
+Suitable for scenarios that require rapid trajectory simplification of large-scale data, and where the trajectory shapes are relatively simple and uniform.
+
 **Note:**  These algorithms have their own advantages and disadvantages in different application scenarios. In practical applications, it is necessary to choose the appropriate trajectory simplification algorithm based on the characteristics and requirements of the data. In some cases, you may need to adjust or optimize the algorithm according to your own needs.
 ## Contribution
 

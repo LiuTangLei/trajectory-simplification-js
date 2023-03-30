@@ -1,7 +1,12 @@
+interface Coordinate {
+    latitude: number;
+    longitude: number;
+}
+
 const EARTH_RADIUS = 6370996.81;
 
 // Calculate the distance between two points
-const calculateDistance = (point1, point2) => {
+const calculateDistance = <T extends Coordinate>(point1: T, point2: T): number => {
     const { latitude: lat1, longitude: lng1 } = point1;
     const { latitude: lat2, longitude: lng2 } = point2;
     const radLat1 = lat1 * Math.PI / 180.0;
@@ -13,11 +18,11 @@ const calculateDistance = (point1, point2) => {
 };
 
 // Sliding-Window Algorithm
-const slidingWindow = (coordinates, tolerance) => {
+const slidingWindow = <T extends Coordinate>(coordinates: T[], tolerance: number): T[] => {
     let startIndex = 0;
     let endIndex = 2;
 
-    const simplifiedCoordinates = [coordinates[startIndex]];
+    const simplifiedCoordinates: T[] = [coordinates[startIndex]];
 
     while (endIndex < coordinates.length) {
         let maxDistance = 0;
@@ -43,3 +48,4 @@ const slidingWindow = (coordinates, tolerance) => {
 };
 
 export default { slidingWindow };
+
