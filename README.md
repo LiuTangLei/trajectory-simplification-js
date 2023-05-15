@@ -131,6 +131,40 @@ are relatively simple and uniform.
 Suitable for scenarios that require the preservation of trajectory shape and density, such as GPS tracking and
 geographic information systems.
 
+## Imai-Iri Algorithm
+
+### Advantages
+
+- Able to handle trajectories with complex shapes.
+- Preserves the shape of the original trajectory well.
+- Can be used to simplify both 2D and 3D trajectories.
+
+### Disadvantages
+
+- Requires a relatively high computational complexity.
+- May not be suitable for scenarios that require extreme simplification.
+
+### Applicable Scenarios
+
+Suitable for scenarios that require the preservation of trajectory shape, such as GIS applications, and can also handle complex 2D and 3D trajectory data processing.
+
+## Bellman's Algorithm
+
+### Advantages
+
+- Able to handle large amounts of data.
+- Suitable for 2D and 3D trajectories.
+- Preserves the shape of the original trajectory well.
+
+### Disadvantages
+
+- Higher computational complexity.
+- May not be suitable for scenarios that require extreme simplification.
+
+### Applicable Scenarios
+
+Suitable for scenarios that require the preservation of trajectory shape, such as GIS applications, and for large scale data processing.
+
 ## Opheim Algorithm
 
 ### Advantages
@@ -167,7 +201,10 @@ geographic information systems, as well as for 3D trajectory data processing.
 Suitable for scenarios that require the preservation of trajectory shape and density, such as GPS tracking and
 geographic information systems, as well as for complex 2D and 3D trajectory data processing.
 
-**Note:**  These algorithms have their own advantages and disadvantages in different application scenarios. In practical
+
+## Note
+
+These algorithms have their own advantages and disadvantages in different application scenarios. In practical
 applications, it is necessary to choose the appropriate trajectory simplification algorithm based on the characteristics
 and requirements of the data. In some cases, you may need to adjust or optimize the algorithm according to your own
 needs.
@@ -177,6 +214,6 @@ needs.
 If you would like to contribute to this project, feel free to submit a pull request with your suggestions, improvements
 or new algorithms.
 
-### License
+## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
