@@ -1,91 +1,103 @@
-// Calculate the distance between two points
-const calculationDistance = (point1, point2) => {
-    const lat1 = point1.latitude;
-    const lat2 = point2.latitude;
-    const lng1 = point1.longitude;
-    const lng2 = point2.longitude;
-    const radLat1 = lat1 * Math.PI / 180.0;
-    const radLat2 = lat2 * Math.PI / 180.0;
-    const a = radLat1 - radLat2;
-    const b = (lng1 * Math.PI / 180.0) - (lng2 * Math.PI / 180.0);
-    const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
+// Helper function to convert degrees to radians
+const degreeToRadian = (degree) => degree * Math.PI / 180.0;
+
+// Calculates the Euclidean distance between two geographical points
+const calculateDistanceBetweenPoints = (point1, point2) => {
+    // Convert latitude and longitude from degrees to radians
+    const radLat1 = degreeToRadian(point1.latitude);
+    const radLat2 = degreeToRadian(point2.latitude);
+    const radLon1 = degreeToRadian(point1.longitude);
+    const radLon2 = degreeToRadian(point2.longitude);
+
+    const deltaLat = radLat1 - radLat2;
+    const deltaLon = radLon1 - radLon2;
+
+    // Haversine formula
+    const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLon / 2), 2)));
+
+    // Return the distance in meters
     return s * 6370996.81;
 };
 
-// Calculate the distance between point pX and the line determined by points pA and pB
-const distToSegment = (start, end, center) => {
-    const a = Math.abs(calculationDistance(start, end));
-    const b = Math.abs(calculationDistance(start, center));
-    const c = Math.abs(calculationDistance(end, center));
-    const p = (a + b + c) / 2.0;
-    const s = Math.sqrt(Math.abs(p * (p - a) * (p - b) * (p - c)));
-    return s * 2.0 / a;
+// Calculates the perpendicular distance from a point to a line segment
+const calculatePerpendicularDistance = (start, end, center) => {
+    const a = Math.abs(calculateDistanceBetweenPoints(start, end));
+    const b = Math.abs(calculateDistanceBetweenPoints(start, center));
+    const c = Math.abs(calculateDistanceBetweenPoints(end, center));
+
+    // Heron's formula for the area of a triangle
+    const semiPerimeter = (a + b + c) / 2.0;
+    const area = Math.sqrt(semiPerimeter * (semiPerimeter - a) * (semiPerimeter - b) * (semiPerimeter - c));
+
+    // The perpendicular distance from center to the line segment (start, end) is twice the area divided by the base length a
+    return 2.0 * area / a;
 };
 
 // Recursively compress the trajectory
-const compressLine = (coordinate, result, start, end, dMax) => {
+const compressLine = (coordinate, start, end, dMax) => {
+    // Initialize the result array
+    let result = [];
+
+    // We only proceed if the start index is less than the end index
     if (start < end) {
         let maxDist = 0;
         let currentIndex = 0;
-        const startPoint = coordinate[start];
-        const endPoint = coordinate[end];
+        const startPoint = coordinate[start].point;
+        const endPoint = coordinate[end].point;
 
+        // Find the point with the greatest distance from the line segment (startPoint, endPoint)
         for (let i = start + 1; i < end; i++) {
-            const currentDist = distToSegment(startPoint, endPoint, coordinate[i]);
+            const currentDist = calculatePerpendicularDistance(startPoint, endPoint, coordinate[i].point);
             if (currentDist > maxDist) {
                 maxDist = currentDist;
                 currentIndex = i;
             }
         }
 
+        // If the maximum distance is greater than the threshold, recursively simplify the trajectory
         if (maxDist >= dMax) {
-            // Add the current point to the filtered array
-            result.push(coordinate[currentIndex]);
+            result.push(coordinate[currentIndex].point);
 
-            // Split the original line segment into two segments with the current point as the center and recursively process them separately
-            compressLine(coordinate, result, start, currentIndex, dMax);
-            compressLine(coordinate, result, currentIndex, end, dMax);
+            // Concatenate the results of the recursive calls
+            result = result.concat(
+                compressLine(coordinate, start, currentIndex, dMax),
+                compressLine(coordinate, currentIndex, end, dMax)
+            );
         }
     }
 
+    // Return the simplified trajectory
     return result;
 };
 
 /**
  * Simplifies a given trajectory using the Douglas-Peucker algorithm.
- * @param {Array<{latitude,longitude}>} coordinate - Original trajectory.
- * @param {number} [dMax=10] - Maximum allowable distance error.
- * @return {Array<{latitude,longitude}>} - Simplified trajectory.
- * @warning If the coordinate objects have an 'index' property, please replace the 'index' used in this method with a non-conflicting name.
+ * @param {Array} coordinate - The original trajectory coordinates.
+ * @param {number} [dMax=10] - The maximum allowable perpendicular distance (in meters) from a point to the line segment connecting its neighboring points in the simplified trajectory.
+ * @return {Array} - The simplified
+ trajectory.
+
+ @throws {Error} If the input coordinates array is null or has fewer than two points.
  */
 const douglasPeucker = (coordinate, dMax = 10) => {
-    if (!coordinate || !(coordinate.length > 2)) {
-        return null;
+    if (!coordinate || coordinate.length < 2) {
+        throw new Error("Invalid input: coordinates array must have at least two points.");
     }
 
-    // Map the original coordinates array to include the index
-    const indexedCoordinates = coordinate.map((item, index) => ({...item, index}));
+// We create a new array of objects, adding the index and the original point to each coordinate
+    const indexedCoordinates = coordinate.map((item, index) => ({index, point: item}));
 
-    let result = compressLine(indexedCoordinates, [], 0, indexedCoordinates.length - 1, dMax);
-    result.push(indexedCoordinates[0]);
-    result.push(indexedCoordinates[indexedCoordinates.length - 1]);
+// Initialize the result array with the first and last points
+    let result = [indexedCoordinates[0].point, indexedCoordinates[indexedCoordinates.length - 1].point];
 
-    // Sort the results array based on the original indices
-    let resultLatLng = result.sort((a, b) => {
-        if (a.index < b.index) {
-            return -1;
-        } else if (a.index > b.index) {
-            return 1;
-        }
-        return 0;
-    });
+// Recursively simplify the trajectory
+    result = result.concat(compressLine(indexedCoordinates, 0, indexedCoordinates.length - 1, dMax));
 
-    // Remove the index property from the result
-    resultLatLng.forEach((item) => {
-        delete item.index;
-    });
+// Sort the result array by the original indices to maintain the trajectory's order
+    const sortedResult = result.sort((a, b) => indexedCoordinates.find(item => item.point === a).index - indexedCoordinates.find(item => item.point === b).index);
 
-    return resultLatLng;
+// Return the simplified trajectory
+    return sortedResult;
 };
 
-export default {douglasPeucker};
+module.exports = {douglasPeucker};
