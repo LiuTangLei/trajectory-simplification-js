@@ -1,0 +1,26 @@
+{
+  "name": "trajectory-simplification-js",
+  "version": "1.0.3",
+  "description": "Trajectory-simplification-js is a JavaScript library that provides a collection of trajectory simplification algorithms for developers. The library offers various popular algorithms to simplify trajectory data by removing redundant points while preserving the original shape of the path.",
+  "main": "test/DouglasPeucker.test.ts",
+  "scripts": {
+    "test": "mocha -r ts-node/esm 'test/*.test.ts'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LiuTangLei/trajectory-simplification-js.git"
+  },
+  "author": "LIU TANGLEI",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LiuTangLei/trajectory-simplification-js/issues"
+  },
+  "homepage": "https://github.com/LiuTangLei/trajectory-simplification-js#readme",
+  "devDependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1"
+  }
+}

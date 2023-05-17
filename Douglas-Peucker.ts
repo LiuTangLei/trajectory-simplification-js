@@ -95,7 +95,7 @@ const compressLine = <T extends Coordinate>(coordinate: IndexedCoordinate<T>[], 
 
  @warning If the coordinate objects have an 'index' property, it will be overwritten in this function.
  */
-const douglasPeucker = <T extends Coordinate>(coordinate: T[], dMax: number = 10): T[] => {
+export const douglasPeucker = <T extends Coordinate>(coordinate: T[], dMax: number = 10): T[] => {
     if (!coordinate || coordinate.length < 2) {
         throw new Error("Invalid input: coordinates array must have at least two points.");
     }
