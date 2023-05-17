@@ -84,20 +84,17 @@ const douglasPeucker = (coordinate, dMax = 10) => {
         throw new Error("Invalid input: coordinates array must have at least two points.");
     }
 
-// We create a new array of objects, adding the index and the original point to each coordinate
+    // We create a new array of objects, adding the index and the original point to each coordinate
     const indexedCoordinates = coordinate.map((item, index) => ({index, point: item}));
 
-// Initialize the result array with the first and last points
+    // Initialize the result array with the first and last points
     let result = [indexedCoordinates[0].point, indexedCoordinates[indexedCoordinates.length - 1].point];
 
-// Recursively simplify the trajectory
+    // Recursively simplify the trajectory
     result = result.concat(compressLine(indexedCoordinates, 0, indexedCoordinates.length - 1, dMax));
 
-// Sort the result array by the original indices to maintain the trajectory's order
-    const sortedResult = result.sort((a, b) => indexedCoordinates.find(item => item.point === a).index - indexedCoordinates.find(item => item.point === b).index);
-
-// Return the simplified trajectory
-    return sortedResult;
+    // Sort the result array by the original indices to maintain the trajectory's order
+    return result.sort((a, b) => indexedCoordinates.find(item => item.point === a).index - indexedCoordinates.find(item => item.point === b).index);
 };
 
 module.exports = {douglasPeucker};
