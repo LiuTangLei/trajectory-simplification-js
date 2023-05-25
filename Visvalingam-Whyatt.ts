@@ -48,7 +48,7 @@ const calculateTriangleArea = (a: Coordinate, b: Coordinate, c: Coordinate): num
 };
 
 // Function to perform the Visvalingam-Whyatt simplification on a set of geographic coordinates.
-const visvalingamWhyatt = (coordinates: Coordinate[], tolerance: number): Coordinate[] => {
+export const visvalingamWhyatt = (coordinates: Coordinate[], tolerance: number): Coordinate[] => {
     // Initialize IndexedCoordinate objects.
     let indexedCoordinates: IndexedCoordinate[] = coordinates.map((coord, index) => ({
         ...coord,
@@ -87,5 +87,3 @@ const visvalingamWhyatt = (coordinates: Coordinate[], tolerance: number): Coordi
     // Return the simplified coordinates in their original order.
     return indexedCoordinates.sort((a, b) => a.index - b.index);
 };
-
-export default {visvalingamWhyatt};

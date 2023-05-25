@@ -96,5 +96,3 @@ export const douglasPeucker = <T extends Coordinate>(coordinate: T[], dMax: numb
     compressLine(indexedCoordinates, 0, indexedCoordinates.length - 1, dMax, result);
     return result;
 };
-
-export default {douglasPeucker};

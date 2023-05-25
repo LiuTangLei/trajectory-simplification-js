@@ -2,7 +2,7 @@
   "name": "trajectory-simplification-js",
   "version": "1.0.3",
   "description": "Trajectory-simplification-js is a JavaScript library that provides a collection of trajectory simplification algorithms for developers. The library offers various popular algorithms to simplify trajectory data by removing redundant points while preserving the original shape of the path.",
-  "main": "test/DouglasPeucker.test.ts",
+  "main": "test/Douglas-Peucker.test.ts",
   "scripts": {
     "test": "mocha -r ts-node/esm 'test/*.test.ts'"
   },
