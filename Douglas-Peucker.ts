@@ -31,54 +31,40 @@ const calculateDistanceBetweenPoints = <T extends Coordinate>(point1: T, point2:
 };
 
 // Calculates the perpendicular distance from a point to a line segment
-const calculatePerpendicularDistance = <T extends Coordinate>(start: T, end: T, center: T): number => {
-    const a = Math.abs(calculateDistanceBetweenPoints(start, end));
-    const b = Math.abs(calculateDistanceBetweenPoints(start, center));
-    const c = Math.abs(calculateDistanceBetweenPoints(end, center));
-
-    // Heron's formula for the area of a triangle
+const calculatePerpendicularDistance = (a: number, b: number, c: number): number => {
     const semiPerimeter = (a + b + c) / 2.0;
     const area = Math.sqrt(semiPerimeter * (semiPerimeter - a) * (semiPerimeter - b) * (semiPerimeter - c));
 
-    // The perpendicular distance from center to the line segment (start, end) is twice the area divided by the base length a
     return 2.0 * area / a;
 };
 
 // Recursively compress the trajectory
-const compressLine = <T extends Coordinate>(coordinate: IndexedCoordinate<T>[], start: number, end: number, dMax: number): T[] => {
+const compressLine = <T extends Coordinate>(coordinate: IndexedCoordinate<T>[], start: number, end: number, dMax: number, result: T[]): void => {
     // Initialize the result array
-    let result: T[] = [];
-
-    // Only proceed if the start index is less than the end index
     if (start < end) {
         let maxDist = 0;
         let currentIndex = 0;
         const startPoint = coordinate[start];
         const endPoint = coordinate[end];
 
-        // Find the point with the greatest distance from the line segment (startPoint, endPoint)
+        const a = calculateDistanceBetweenPoints(startPoint, endPoint);
+
         for (let i = start + 1; i < end; i++) {
-            const currentDist = calculatePerpendicularDistance(startPoint, endPoint, coordinate[i]);
+            const b = calculateDistanceBetweenPoints(startPoint, coordinate[i]);
+            const c = calculateDistanceBetweenPoints(endPoint, coordinate[i]);
+            const currentDist = calculatePerpendicularDistance(a, b, c);
             if (currentDist > maxDist) {
                 maxDist = currentDist;
                 currentIndex = i;
             }
         }
 
-        // If the maximum distance is greater than the threshold, recursively simplify the trajectory
         if (maxDist >= dMax) {
             result.push(coordinate[currentIndex].point);
-
-            // Concatenate the results of the recursive calls
-            result = result.concat(
-                compressLine(coordinate, start, currentIndex, dMax),
-
-                compressLine(coordinate, currentIndex, end, dMax)
-            );
+            compressLine(coordinate, start, currentIndex, dMax, result);
+            compressLine(coordinate, currentIndex, end, dMax, result);
         }
     }
-    // Return the simplified trajectory
-    return result;
 };
 
 /**
@@ -107,10 +93,8 @@ export const douglasPeucker = <T extends Coordinate>(coordinate: T[], dMax: numb
     let result: T[] = [indexedCoordinates[0].point, indexedCoordinates[indexedCoordinates.length - 1].point];
 
     // Recursively simplify the trajectory
-    result = result.concat(compressLine(indexedCoordinates, 0, indexedCoordinates.length - 1, dMax));
-
-    // Sort the result array by the original indices to maintain the trajectory's order
-    return result.sort((a: T, b: T) => indexedCoordinates.find(item => item.point === a)!.index - indexedCoordinates.find(item => item.point === b)!.index);
+    compressLine(indexedCoordinates, 0, indexedCoordinates.length - 1, dMax, result);
+    return result;
 };
 
 export default {douglasPeucker};

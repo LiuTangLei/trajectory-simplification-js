@@ -57,8 +57,11 @@ describe('DouglasPeucker', function () {
             }
         }
         const originalLength: number = trajectory.length;
+        console.log(`Original trajectory length: ${originalLength}`);
+
         const simplifiedTrajectory: { latitude: number, longitude: number }[] = douglasPeucker(trajectory, 8);
         const simplifiedLength: number = simplifiedTrajectory.length;
+        console.log(`Simplified trajectory length: ${simplifiedLength}`);
 
         // Assert that the simplified trajectory is shorter than the original trajectory
         expect(simplifiedLength).to.be.lessThan(originalLength);
