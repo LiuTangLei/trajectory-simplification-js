@@ -183,24 +183,22 @@ Suitable for scenarios that require the preservation of trajectory shape, such a
 Suitable for scenarios that require the preservation of topological characteristics, such as road networks and
 geographic information systems, as well as for 3D trajectory data processing.
 
-## Long Algorithm
+## Lang Algorithm
 
 ### Advantages
 
-- Able to handle trajectories with complex shapes and varying densities of data points.
-- Can control the level of simplification by adjusting the distance threshold.
-- Preserves the shape of the original trajectory well.
+- Simple and efficient, capable of handling trajectories with complex shapes.
+- Allows control over the level of simplification by adjusting the distance threshold.
 
 ### Disadvantages
 
-- Requires a relatively high computational complexity.
-- May not be suitable for scenarios that require extreme simplification.
+- Preserves the shape of the original trajectory only to a moderate extent, depending on the chosen threshold.
+- May demand a fine balance between computational efficiency and accuracy in preserving the trajectory.
+- Might not be suitable for scenarios that require meticulous preservation of the original trajectory.
 
 ### Applicable Scenarios
 
-Suitable for scenarios that require the preservation of trajectory shape and density, such as GPS tracking and
-geographic information systems, as well as for complex 2D and 3D trajectory data processing.
-
+Ideal for applications where simplicity and computational efficiency are priorities, and where perfect preservation of the original trajectory shape is not critical. Examples might include basic GPS tracking and initial data processing in geographic information systems.
 
 ## Note
 
