@@ -99,19 +99,19 @@ geographic information systems.
 ### Advantages
 
 - Simple implementation, easy to understand and use.
-- Suitable for large-scale trajectory data processing.
-- Can control the level of simplification by adjusting the window size.
+- Provides control over simplification level through window size adjustment.
 
 ### Disadvantages
 
-- Limited in handling complex trajectory shapes.
-- The choice of window size has a significant impact on the simplification effect.
+- Limited capability in handling complex trajectory shapes.
+- Choice of window size significantly affects simplification effect.
 - May not be suitable for trajectories with uneven point densities.
+- Performance may be inferior compared to more advanced algorithms like Douglas-Peucker.
 
 ### Applicable Scenarios
 
-Suitable for scenarios that require rapid trajectory simplification of large-scale data, and where the trajectory shapes
-are relatively simple and uniform.
+Suitable for scenarios that require rapid trajectory simplification, especially when trajectory shapes are relatively simple and uniform, and data scale is not extremely large.
+For larger datasets or more complex trajectory shapes, considering more efficient algorithms like Douglas-Peucker might be advisable.
 
 ## Priority-Queue Algorithm
 
@@ -147,23 +147,6 @@ geographic information systems.
 ### Applicable Scenarios
 
 Suitable for scenarios that require the preservation of trajectory shape, such as GIS applications, and can also handle complex 2D and 3D trajectory data processing.
-
-## Bellman's Algorithm
-
-### Advantages
-
-- Able to handle large amounts of data.
-- Suitable for 2D and 3D trajectories.
-- Preserves the shape of the original trajectory well.
-
-### Disadvantages
-
-- Higher computational complexity.
-- May not be suitable for scenarios that require extreme simplification.
-
-### Applicable Scenarios
-
-Suitable for scenarios that require the preservation of trajectory shape, such as GIS applications, and for large scale data processing.
 
 ## Opheim Algorithm
 

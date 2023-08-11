@@ -3,46 +3,57 @@ interface Coordinate {
     longitude: number;
 }
 
+const toRadians = (degree: number): number => degree * Math.PI / 180.0;
 const EARTH_RADIUS = 6370996.81;
 
-// Calculate the distance between two points
-const calculateDistance = <T extends Coordinate>(point1: T, point2: T): number => {
+const calculateDistance = (point1: Coordinate, point2: Coordinate): number => {
     const { latitude: lat1, longitude: lng1 } = point1;
     const { latitude: lat2, longitude: lng2 } = point2;
-    const radLat1 = lat1 * Math.PI / 180.0;
-    const radLat2 = lat2 * Math.PI / 180.0;
+    const radLat1 = toRadians(lat1);
+    const radLat2 = toRadians(lat2);
     const a = radLat1 - radLat2;
-    const b = (lng1 * Math.PI / 180.0) - (lng2 * Math.PI / 180.0);
+    const b = toRadians(lng1) - toRadians(lng2);
     const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
     return s * EARTH_RADIUS;
 };
 
-// Sliding-Window Algorithm
-const slidingWindow = <T extends Coordinate>(coordinates: T[], tolerance: number): T[] => {
-    let startIndex = 0;
-    let endIndex = 2;
+const slidingWindow = (coordinates: Coordinate[], windowSize: number, tolerance: number): Coordinate[] => {
+    const simplifiedCoordinates: Coordinate[] = [coordinates[0]];
 
-    const simplifiedCoordinates: T[] = [coordinates[startIndex]];
-
-    while (endIndex < coordinates.length) {
+    for (let i = 0; i < coordinates.length - windowSize; i += windowSize) {
         let maxDistance = 0;
+        let indexWithMaxDistance = i;
 
-        for (let i = startIndex + 1; i < endIndex; i++) {
-            const distance = calculateDistance(coordinates[startIndex], coordinates[i]);
+        for (let j = i; j < i + windowSize && j < coordinates.length; j++) { // Add a condition to make sure we don't go out of bounds
+            const distance = calculateDistance(coordinates[i], coordinates[j]);
             if (distance > maxDistance) {
                 maxDistance = distance;
+                indexWithMaxDistance = j;
             }
         }
 
         if (maxDistance > tolerance) {
-            simplifiedCoordinates.push(coordinates[endIndex - 1]);
-            startIndex = endIndex - 1;
+            simplifiedCoordinates.push(coordinates[indexWithMaxDistance]);
         }
-
-        endIndex++;
     }
 
-    simplifiedCoordinates.push(coordinates[endIndex - 1]);
+    // Check the last window
+    let maxDistance = 0;
+    let indexWithMaxDistance = coordinates.length - windowSize;
+
+    for (let j = coordinates.length - windowSize; j < coordinates.length; j++) {
+        const distance = calculateDistance(coordinates[coordinates.length - windowSize], coordinates[j]);
+        if (distance > maxDistance) {
+            maxDistance = distance;
+            indexWithMaxDistance = j;
+        }
+    }
+
+    if (maxDistance > tolerance) {
+        simplifiedCoordinates.push(coordinates[indexWithMaxDistance]);
+    }
+
+    simplifiedCoordinates.push(coordinates[coordinates.length - 1]);
 
     return simplifiedCoordinates;
 };
