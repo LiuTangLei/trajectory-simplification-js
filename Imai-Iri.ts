@@ -28,10 +28,34 @@ const haversineDistance = (start: Coordinate, end: Coordinate): number => {
   return R * c; // Distance in meters
 };
 
+// 假设其他函数和类型定义保持不变
+
 const findShortestPath = (graph: boolean[][], n: number): number[] => {
-  // Implement the logic to find the shortest path from the first to the last point
-  // This is a placeholder logic assuming a direct path from the first to the last point
-  return [0, n - 1];
+  // 初始化动态规划数组和前驱节点数组
+  const dp = new Array(n).fill(Infinity);
+  const prev = new Array(n).fill(-1);
+  dp[0] = 0;
+
+  // 更新dp数组和前驱节点
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (graph[i][j] && dp[i] + 1 < dp[j]) {
+        dp[j] = dp[i] + 1;
+        prev[j] = i;
+      }
+    }
+  }
+
+  // 从终点回溯至起点构建路径
+  let current = n - 1;
+  const path = [];
+  while (current !== -1) {
+    path.push(current);
+    current = prev[current];
+  }
+  path.reverse();
+
+  return path.length > 1 ? path : []; // 如果路径有效（长度大于1），则返回路径，否则返回空数组
 };
 
 // Converts the polyline into a sequence of segments and applies the Imai-Iri simplification.
