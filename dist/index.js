@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.visvalingamWhyatt = exports.radialDistance = exports.imaiIriSimplify = exports.douglasPeucker = void 0;
+var Douglas_Peucker_1 = require("./Douglas-Peucker");
+Object.defineProperty(exports, "douglasPeucker", { enumerable: true, get: function () { return Douglas_Peucker_1.douglasPeucker; } });
+var Imai_Iri_1 = require("./Imai-Iri");
+Object.defineProperty(exports, "imaiIriSimplify", { enumerable: true, get: function () { return Imai_Iri_1.imaiIriSimplify; } });
+var Radial_Distance_1 = require("./Radial-Distance");
+Object.defineProperty(exports, "radialDistance", { enumerable: true, get: function () { return Radial_Distance_1.radialDistance; } });
+var Visvalingam_Whyatt_1 = require("./Visvalingam-Whyatt");
+Object.defineProperty(exports, "visvalingamWhyatt", { enumerable: true, get: function () { return Visvalingam_Whyatt_1.visvalingamWhyatt; } });

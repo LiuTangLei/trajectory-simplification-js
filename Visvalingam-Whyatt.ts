@@ -1,84 +1,162 @@
-// Define interface for geographic coordinates.
-interface Coordinate {
-    latitude: number;
-    longitude: number;
-}
+import {triangleArea, validateCoordinates, validateTolerance} from './geometry';
+import type {Coordinate} from './types';
 
-// Extend Coordinate to include an index for original order and an area for the associated triangle.
-interface IndexedCoordinate extends Coordinate {
+export type {Coordinate} from './types';
+
+interface LinkedCoordinate<T extends Coordinate> {
     index: number;
-    area: number; // Changed to mandatory to simplify handling
+    point: T;
+    previous?: LinkedCoordinate<T>;
+    next?: LinkedCoordinate<T>;
+    area: number;
+    version: number;
+    removed: boolean;
 }
 
-// Earth's radius in meters.
-const EARTH_RADIUS = 6370996.81;
+interface QueueItem<T extends Coordinate> {
+    node: LinkedCoordinate<T>;
+    area: number;
+    version: number;
+}
 
-// Helper function to convert degrees to radians.
-const degreeToRadian = (degree: number): number => degree * Math.PI / 180.0;
+class MinHeap<T> {
+    private readonly items: T[] = [];
 
-// Function to calculate the distance between two points on the Earth's surface.
-const calculateDistance = (point1: Coordinate, point2: Coordinate): number => {
-    const radLat1 = degreeToRadian(point1.latitude);
-    const radLat2 = degreeToRadian(point2.latitude);
-    const radLon1 = degreeToRadian(point1.longitude);
-    const radLon2 = degreeToRadian(point2.longitude);
+    constructor(private readonly compare: (left: T, right: T) => number) {}
 
-    const a = radLat1 - radLat2;
-    const b = radLon1 - radLon2;
-
-    const s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
-    return s * EARTH_RADIUS;
-};
-
-// Function to calculate the area of a triangle formed by three points.
-const calculateTriangleArea = (a: Coordinate, b: Coordinate, c: Coordinate): number => {
-    const ab = calculateDistance(a, b);
-    const bc = calculateDistance(b, c);
-    const ca = calculateDistance(c, a);
-
-    const s = (ab + bc + ca) / 2;
-    return Math.sqrt(s * (s - ab) * (s - bc) * (s - ca));
-};
-
-// Function to perform the Visvalingam-Whyatt simplification on a set of geographic coordinates.
-export const visvalingamWhyatt = (coordinates: Coordinate[], tolerance: number): Coordinate[] => {
-    if (coordinates.length <= 2) return coordinates; // No simplification needed for 2 or fewer points
-
-    let indexedCoordinates: IndexedCoordinate[] = coordinates.map((coord, index) => ({
-        ...coord,
-        index,
-        area: index === 0 || index === coordinates.length - 1 ? Infinity : calculateTriangleArea(coordinates[index - 1], coord, coordinates[index + 1]),
-    }));
-
-    // Sort by area initially to prepare for efficient removal
-    indexedCoordinates.sort((a, b) => a.area - b.area);
-
-    while (indexedCoordinates.length > 2 && indexedCoordinates[0].area < tolerance) {
-        const current = indexedCoordinates.shift()!; // Remove the point with the smallest area
-
-        // Update areas of neighbors
-        for (let i = 0; i < indexedCoordinates.length; i++) {
-            if (indexedCoordinates[i].index === current.index - 1 || indexedCoordinates[i].index === current.index + 1) {
-                // Find neighbors in the original array
-                const prevIndex = i > 0 ? i - 1 : i;
-                const nextIndex = i < indexedCoordinates.length - 1 ? i + 1 : i;
-
-                // Recalculate areas for affected neighbors
-                indexedCoordinates[i].area = calculateTriangleArea(
-                    indexedCoordinates[prevIndex],
-                    indexedCoordinates[i],
-                    indexedCoordinates[nextIndex]
-                );
-            }
-        }
-
-        // Sort again after updating areas
-        indexedCoordinates.sort((a, b) => a.area - b.area);
+    get size(): number {
+        return this.items.length;
     }
 
-    // Filter out removed points and restore original order
-    return indexedCoordinates
-        .filter(coord => coord.area >= tolerance)
-        .sort((a, b) => a.index - b.index)
-        .map(({ latitude, longitude }) => ({ latitude, longitude }));
+    push(item: T): void {
+        this.items.push(item);
+        this.bubbleUp(this.items.length - 1);
+    }
+
+    pop(): T | undefined {
+        if (this.items.length === 0) {
+            return undefined;
+        }
+
+        const root = this.items[0];
+        const last = this.items.pop()!;
+        if (this.items.length > 0) {
+            this.items[0] = last;
+            this.bubbleDown(0);
+        }
+
+        return root;
+    }
+
+    private bubbleUp(index: number): void {
+        let currentIndex = index;
+        while (currentIndex > 0) {
+            const parentIndex = Math.floor((currentIndex - 1) / 2);
+            if (this.compare(this.items[currentIndex], this.items[parentIndex]) >= 0) {
+                break;
+            }
+
+            this.swap(currentIndex, parentIndex);
+            currentIndex = parentIndex;
+        }
+    }
+
+    private bubbleDown(index: number): void {
+        let currentIndex = index;
+
+        while (true) {
+            const leftIndex = currentIndex * 2 + 1;
+            const rightIndex = leftIndex + 1;
+            let smallestIndex = currentIndex;
+
+            if (leftIndex < this.items.length && this.compare(this.items[leftIndex], this.items[smallestIndex]) < 0) {
+                smallestIndex = leftIndex;
+            }
+
+            if (rightIndex < this.items.length && this.compare(this.items[rightIndex], this.items[smallestIndex]) < 0) {
+                smallestIndex = rightIndex;
+            }
+
+            if (smallestIndex === currentIndex) {
+                break;
+            }
+
+            this.swap(currentIndex, smallestIndex);
+            currentIndex = smallestIndex;
+        }
+    }
+
+    private swap(leftIndex: number, rightIndex: number): void {
+        const value = this.items[leftIndex];
+        this.items[leftIndex] = this.items[rightIndex];
+        this.items[rightIndex] = value;
+    }
+}
+
+const queueNode = <T extends Coordinate>(heap: MinHeap<QueueItem<T>>, node: LinkedCoordinate<T>): void => {
+    if (!node.previous || !node.next || node.removed) {
+        return;
+    }
+
+    node.area = triangleArea(node.previous.point, node.point, node.next.point);
+    node.version += 1;
+    heap.push({node, area: node.area, version: node.version});
 };
+
+export const visvalingamWhyatt = <T extends Coordinate>(coordinates: readonly T[], areaTolerance = 1): T[] => {
+    validateCoordinates(coordinates);
+    validateTolerance('Visvalingam-Whyatt area', areaTolerance);
+
+    if (coordinates.length <= 2) {
+        return [...coordinates];
+    }
+
+    const nodes = coordinates.map<LinkedCoordinate<T>>((point, index) => ({
+        index,
+        point,
+        area: Infinity,
+        version: 0,
+        removed: false,
+    }));
+
+    for (let index = 0; index < nodes.length; index++) {
+        nodes[index].previous = nodes[index - 1];
+        nodes[index].next = nodes[index + 1];
+    }
+
+    const heap = new MinHeap<QueueItem<T>>((left, right) => left.area - right.area);
+    for (let index = 1; index < nodes.length - 1; index++) {
+        queueNode(heap, nodes[index]);
+    }
+
+    while (heap.size > 0) {
+        const item = heap.pop()!;
+        const node = item.node;
+        if (node.removed || node.version !== item.version) {
+            continue;
+        }
+
+        if (item.area >= areaTolerance) {
+            break;
+        }
+
+        node.removed = true;
+        if (node.previous) {
+            node.previous.next = node.next;
+        }
+        if (node.next) {
+            node.next.previous = node.previous;
+        }
+
+        if (node.previous) {
+            queueNode(heap, node.previous);
+        }
+        if (node.next) {
+            queueNode(heap, node.next);
+        }
+    }
+
+    return nodes.filter(node => !node.removed).map(node => node.point);
+};
+
+export default visvalingamWhyatt;

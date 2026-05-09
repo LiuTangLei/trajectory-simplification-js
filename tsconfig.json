@@ -3,9 +3,14 @@
     "target": "es2021",
     "module": "CommonJS",
     "lib": ["es2021", "dom"],
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["*.ts"],
+  "exclude": ["dist", "node_modules", "test"]
 }
